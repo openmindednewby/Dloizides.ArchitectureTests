@@ -4,7 +4,6 @@ using Xunit;
 namespace Dloizides.ArchitectureTests;
 
 /// <summary>The house architecture rules; derive one test class per service.</summary>
-/// <typeparam name="TWebMarker">Any type in the service's web assembly.</typeparam>
 public abstract class HouseRules<TWebMarker>
 {
     private static readonly Lazy<ServiceArchitecture> Service = new(() => ServiceArchitecture.Load(typeof(TWebMarker).Assembly));
