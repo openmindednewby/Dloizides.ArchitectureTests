@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Linq;
 using Xunit;
 
@@ -19,5 +20,13 @@ public abstract class HouseRules<TWebMarker>
     public void InfrastructureLayer_WhenDependenciesChecked_DoesNotUseWeb() => Assert.Empty(Service.Value.ViolationsOf(ServiceLayer.Infrastructure));
 
     [Fact]
-    public void Requests_WhenValidatorsChecked_EachHasAValidator() => Assert.Empty(RequestValidators.MissingIn(Service.Value.Layers.Values.SelectMany(layer => layer)));
+    public void Requests_WhenValidatorsChecked_EachHasAValidator() => Assert.Empty(ExemptionFilter.Unexempted(MissingValidators(), RequestValidatorExemptions));
+
+    [Fact]
+    public void RequestValidatorExemptions_WhenValidatorsChecked_EachStillLacksAValidator() => Assert.Empty(ExemptionFilter.Stale(MissingValidators(), RequestValidatorExemptions));
+
+    /// <summary>Returns the endpoint requests left without a validator on purpose, each with its reason.</summary>
+    protected virtual IEnumerable<ArchitectureExemption> RequestValidatorExemptions => [];
+
+    private static IReadOnlyList<string> MissingValidators() => RequestValidators.MissingIn(Service.Value.Layers.Values.SelectMany(layer => layer));
 }
