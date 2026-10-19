@@ -15,7 +15,18 @@ public sealed class RequestValidatorsTests
 
         var missing = RequestValidators.MissingIn(assemblies);
 
-        Assert.Equal(new[] { expected }, missing);
+        Assert.Contains(expected, missing);
+    }
+
+    [Fact]
+    public void MissingIn_WithRequestOnlyOnAbstractValidator_NamesTheRequest()
+    {
+        var assemblies = ServiceArchitecture.Load(typeof(DirtyWebMarker).Assembly).Layers.Values.SelectMany(layer => layer);
+        var expected = new[] { typeof(CancelOrderRequest).FullName!, typeof(PlaceOrderRequest).FullName! };
+
+        var missing = RequestValidators.MissingIn(assemblies);
+
+        Assert.Equal(expected, missing);
     }
 
     [Fact]

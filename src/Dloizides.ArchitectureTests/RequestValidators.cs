@@ -10,9 +10,9 @@ public static class RequestValidators
 {
     private const string EndpointBasePrefix = "Endpoint`";
     private const string IdSuffix = "Id";
-    private static readonly string[] ValidatorBases = ["AbstractValidator`1", "Validator`1"];
+    private const string FastEndpointsValidator = "FastEndpoints.Validator`1";
 
-    /// <summary>Names every endpoint request with a non-id property and no validator.</summary>
+    /// <summary>Names every endpoint request with a non-id property and no FastEndpoints <c>Validator&lt;T&gt;</c>.</summary>
     public static IReadOnlyList<string> MissingIn(IEnumerable<Assembly> assemblies)
     {
         var types = assemblies.Distinct().SelectMany(LoadableTypes).ToArray();
@@ -43,7 +43,7 @@ public static class RequestValidators
     {
         for (var current = type.BaseType; current is not null; current = current.BaseType)
         {
-            if (current.IsGenericType && ValidatorBases.Contains(current.GetGenericTypeDefinition().Name, StringComparer.Ordinal))
+            if (current.IsGenericType && string.Equals(current.GetGenericTypeDefinition().FullName, FastEndpointsValidator, StringComparison.Ordinal))
                 yield return current.GetGenericArguments()[0];
         }
     }
