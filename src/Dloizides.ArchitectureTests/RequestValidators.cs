@@ -8,27 +8,36 @@ namespace Dloizides.ArchitectureTests;
 /// <summary>PAT-REVIEW-15 "Validation at the edge with a validator per request".</summary>
 public static class RequestValidators
 {
+    private const string EndpointBasePrefix = "Endpoint`";
+    private const string IdSuffix = "Id";
     private static readonly string[] ValidatorBases = ["AbstractValidator`1", "Validator`1"];
 
-    /// <summary>Names every public *Request type with properties that no validator in the assemblies validates.</summary>
+    /// <summary>Names every endpoint request with a non-id property and no validator.</summary>
     public static IReadOnlyList<string> MissingIn(IEnumerable<Assembly> assemblies)
     {
         var types = assemblies.Distinct().SelectMany(LoadableTypes).ToArray();
+        var own = types.ToHashSet();
         var validated = types.SelectMany(ValidatedTypes).ToHashSet();
         return types
-            .Where(type => IsRequest(type) && !validated.Contains(type))
+            .SelectMany(EndpointRequests)
+            .Distinct()
+            .Where(type => own.Contains(type) && HasBodyProperty(type) && !validated.Contains(type))
             .Select(type => type.FullName ?? type.Name)
             .OrderBy(name => name, StringComparer.Ordinal)
             .ToArray();
     }
 
-    private static bool IsRequest(Type type) =>
-        type.IsClass
-        && type.IsVisible
-        && !type.IsAbstract
-        && !type.IsGenericTypeDefinition
-        && type.Name.EndsWith("Request", StringComparison.Ordinal)
-        && type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Length > 0;
+    private static bool HasBodyProperty(Type type) =>
+        type.GetProperties(BindingFlags.Public | BindingFlags.Instance).Any(property => !property.Name.EndsWith(IdSuffix, StringComparison.Ordinal));
+
+    private static IEnumerable<Type> EndpointRequests(Type type)
+    {
+        for (var current = type.BaseType; current is not null; current = current.BaseType)
+        {
+            if (current.IsGenericType && current.GetGenericTypeDefinition().Name.StartsWith(EndpointBasePrefix, StringComparison.Ordinal))
+                yield return current.GetGenericArguments()[0];
+        }
+    }
 
     private static IEnumerable<Type> ValidatedTypes(Type type)
     {
