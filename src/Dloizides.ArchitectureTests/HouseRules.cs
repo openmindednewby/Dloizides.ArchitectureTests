@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using Xunit;
 
 namespace Dloizides.ArchitectureTests;
@@ -16,4 +17,7 @@ public abstract class HouseRules<TWebMarker>
 
     [Fact]
     public void InfrastructureLayer_WhenDependenciesChecked_DoesNotUseWeb() => Assert.Empty(Service.Value.ViolationsOf(ServiceLayer.Infrastructure));
+
+    [Fact]
+    public void Requests_WhenValidatorsChecked_EachHasAValidator() => Assert.Empty(RequestValidators.MissingIn(Service.Value.Layers.Values.SelectMany(layer => layer)));
 }

@@ -25,3 +25,7 @@ that assembly: the web assembly is `<Prefix>.Web` or `<Prefix>.API`, and the oth
 `<Prefix>.ServiceDefaults`) are not checked. The architecture is loaded once per test class type.
 
 Built for xUnit 2.9.
+
+## Validator per request and tenant query filters
+
+`HouseRules<T>` also fails when a public `*Request` type with properties in the service's layer assemblies has no `AbstractValidator<T>` / FastEndpoints `Validator<T>` (PAT-REVIEW-15). For tenant data, add `public sealed class TenantFilterTests : TenantFilterRules { protected override IReadOnlyModel CreateModel() => ...context.Model; }`: it fails for every root entity with a `TenantId` property and no query filter (PAT-REVIEW-12).
