@@ -10,7 +10,7 @@ public static class ReimplementedPackages
     [
         new("realm-authorization", "Identity.Keycloak", "builder.AddRealmAuthorization() from Identity.Keycloak.Authorization", ["RealmAuthorizationHandler", "RealmAuthorizationExtensions"], []),
         new("api-key-auth", "Dloizides.ApiKeys", "AddApiKeyScheme() with an IApiKeyStore from Dloizides.ApiKeys", ["ApiKeyAuthMiddleware", "ApiKeyAuthenticationHandler"], []),
-        new("swagger-oauth2-pkce", "ApiDocs.AspNetCore", "the shared OAuth2/PKCE docs setup in ApiDocs.AspNetCore (DUP-SCAN-1 cluster 1 moves it there; exempt with a reason until then)", [], ["NSwag.OpenApiOAuthFlow"]),
+        new("swagger-oauth2-pkce", "ApiDocs.AspNetCore", "the shared OAuth2/PKCE docs setup in ApiDocs.AspNetCore (DUP-SCAN-1 cluster 1 moves it there; exempt with a reason until then)", [], ["NSwag.OpenApiOAuthFlow", "Microsoft.OpenApi.Models.OpenApiOAuthFlow", "Microsoft.OpenApi.Models.OpenApiOAuthFlows"]),
         new("log-stress-endpoint", "Logging.Client", "nothing: delete the endpoint, Logging.Client owns log shipping", ["LogStressEndpoint", "LogStressRequest", "LogStressRequestValidator"], []),
     ];
 }

@@ -14,6 +14,8 @@ public static class ReimplementedPackageRules
     public static IReadOnlyList<ReimplementedPackageFinding> MissingIn(Assembly assembly)
     {
         ArgumentNullException.ThrowIfNull(assembly);
+        if (string.IsNullOrEmpty(assembly.Location))
+            throw new ArgumentException($"{assembly.GetName().Name} has no file location (in-memory or single-file); ReimplementedPackageRules reads the assembly from disk", nameof(assembly));
         using var module = ModuleDefinition.ReadModule(assembly.Location);
         return module.GetTypes()
             .SelectMany(type => ReimplementedPackages.All
@@ -31,13 +33,23 @@ public static class ReimplementedPackageRules
         var findings = MissingIn(assembly);
         var names = findings.Select(finding => finding.TypeName).Distinct().ToArray();
         var unexempted = ExemptionFilter.Unexempted(names, exemptions).ToHashSet(StringComparer.Ordinal);
+        var covered = findings
+            .Where(finding => !unexempted.Contains(finding.TypeName))
+            .Select(PatternInNamespace)
+            .ToHashSet(StringComparer.Ordinal);
         var failures = findings
-            .Where(finding => unexempted.Contains(finding.TypeName))
+            .Where(finding => unexempted.Contains(finding.TypeName) && !covered.Contains(PatternInNamespace(finding)))
             .Select(finding => finding.ToString())
             .Concat(ExemptionFilter.Stale(names, exemptions).Select(name => $"{name} is exempted but re-implements no package any more; remove the exemption"))
             .ToArray();
         if (failures.Length > 0)
             Assert.Fail(string.Join(Environment.NewLine, failures));
+    }
+
+    private static string PatternInNamespace(ReimplementedPackageFinding finding)
+    {
+        var lastDot = finding.TypeName.LastIndexOf('.');
+        return $"{finding.Package.Pattern}|{(lastDot < 0 ? string.Empty : finding.TypeName[..lastDot])}";
     }
 
     private static bool Declares(TypeDefinition type, ReimplementedPackage package) => package.DeclaredTypeNames.Contains(type.Name, StringComparer.Ordinal);
