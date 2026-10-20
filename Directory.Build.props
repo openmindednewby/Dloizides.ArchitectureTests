@@ -18,9 +18,9 @@
     <PackageReadmeFile>README.md</PackageReadmeFile>
     <Description>House architecture rules as xUnit tests on ArchUnitNET. PAT-LAYER-1: Domain depends on no other layer of the service, Application only on Domain, Infrastructure not on Web. PAT-REVIEW-15: every *Request has a validator (FastEndpoints, or MVC via ControllerRequestValidatorRules). PAT-REVIEW-12: TenantFilterRules checks every TenantId entity has a query filter. QUAL-ADOPT-1: ReimplementedPackageRules fails when a service re-implements a shared package. A service adds one class HouseArchitectureTests : HouseRules&lt;TAnyTypeInWebAssembly&gt;.</Description>
 
-    <Version>1.5.0</Version>
-    <AssemblyVersion>1.5.0.0</AssemblyVersion>
-    <FileVersion>1.5.0.0</FileVersion>
+    <Version>1.6.0</Version>
+    <AssemblyVersion>1.6.0.0</AssemblyVersion>
+    <FileVersion>1.6.0.0</FileVersion>
   </PropertyGroup>
 
   <ItemGroup>
