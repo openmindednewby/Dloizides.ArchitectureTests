@@ -16,6 +16,7 @@
     <ProjectReference Include="../Fixtures/Clean.Web/Clean.Web.csproj" />
     <ProjectReference Include="../Fixtures/Dirty.Domain/Dirty.Domain.csproj" />
     <ProjectReference Include="../Fixtures/Mvc.Service/Mvc.Service.csproj" />
+    <ProjectReference Include="../Fixtures/Reimplementing.Service/Reimplementing.Service.csproj" />
   </ItemGroup>
 
 </Project>

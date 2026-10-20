@@ -33,3 +33,12 @@ Built for xUnit 2.9.
 For an MVC service, add `public sealed class ControllerValidatorTests : ControllerRequestValidatorRules { protected override IEnumerable<Assembly> ServiceAssemblies => [typeof(Program).Assembly]; }`: it fails for every complex parameter of a public controller action (not `[NonAction]`, not `[FromRoute]`/`[FromHeader]`/`[FromServices]`) declared in those assemblies with a property not named `*Id` and no concrete class implementing FluentValidation `IValidator<T>`, the set `AddValidatorsFromAssembly` registers and a per-argument action filter resolves. A service built as one assembly without `.Domain`/`.Web` suffixes overrides `ServiceAssemblies` on `TenantFilterRules<T>` the same way.
 
 To skip a type on purpose, override `Exemptions` (tenant filter, MVC validator) or `RequestValidatorExemptions` (validator) with `new ArchitectureExemption(typeof(T), "why it is safe")`; the reason is required. An exempted type that gains a filter or validator fails the `...Exemptions_..._EachStill...` test, so a stale exemption cannot linger.
+
+## Re-implemented packages
+
+`ReimplementedPackageRules.AssertNone(typeof(Program).Assembly)` fails for every type in that assembly that re-implements a shared package listed in `ReimplementedPackages.All` (QUAL-ADOPT-1 "Fail lint/arch tests when an app re-implements an existing package"): a local `RealmAuthorizationHandler`/`RealmAuthorizationExtensions` (use `Identity.Keycloak`), an own `ApiKeyAuthMiddleware`/`ApiKeyAuthenticationHandler` (use `Dloizides.ApiKeys`), a method body that builds an NSwag `OpenApiOAuthFlow` (the Swagger OAuth2/PKCE block, owned by `ApiDocs.AspNetCore`), and the `LogStress` debug endpoint (delete it). `ReimplementedPackageRules.MissingIn(assembly)` returns the findings. Pass `new ArchitectureExemption(typeof(T), "why")` for a type kept on purpose; an exemption that matches nothing fails too.
+
+```csharp
+[Fact]
+public void Service_WhenPackagesChecked_ReimplementsNone() => ReimplementedPackageRules.AssertNone(typeof(Program).Assembly);
+```
