@@ -14,5 +14,7 @@ public sealed class ExemptedControllerRouteRulesTests : ControllerRouteRules
         new(typeof(CasesController), "shares v1/cases with the archive controller until the move"),
         new(typeof(IngestController), "ingest actions move into one controller next"),
         new(typeof(IngestJobController), "shares v1/ingest until the move"),
+        new(typeof(DailyReportsController), "report periods merge into one controller next"),
+        new(typeof(MonthlyReportsController), "shares v1/reports through its base until the merge"),
     ];
 }

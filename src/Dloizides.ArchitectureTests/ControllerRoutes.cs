@@ -25,11 +25,18 @@ public static class ControllerRoutes
             .ToArray();
 
     private static IEnumerable<string> Templates(Type controller) =>
-        controller.CustomAttributes
+        SelfAndBases(controller)
+            .SelectMany(type => type.CustomAttributes)
             .Where(attribute => string.Equals(attribute.AttributeType.FullName, RouteAttribute, StringComparison.Ordinal))
             .Select(attribute => attribute.ConstructorArguments.Count > 0 ? attribute.ConstructorArguments[0].Value as string : null)
             .OfType<string>()
             .Select(template => Normalize(template, controller.Name));
+
+    private static IEnumerable<Type> SelfAndBases(Type controller)
+    {
+        for (var current = controller; current is not null; current = current.BaseType)
+            yield return current;
+    }
 
     private static string Normalize(string template, string controllerName)
     {

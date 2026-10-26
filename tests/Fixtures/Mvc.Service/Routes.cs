@@ -13,3 +13,10 @@ public sealed class IngestJobController : ControllerBase;
 
 [Route("v1/audit")]
 public sealed class AuditController : ControllerBase;
+
+[Route("v1/reports")]
+public abstract class ReportsControllerBase : ControllerBase;
+
+public sealed class DailyReportsController : ReportsControllerBase;
+
+public sealed class MonthlyReportsController : ReportsControllerBase;

@@ -16,6 +16,22 @@ public sealed class LedgerStore(IRepository<Account> accounts) : IRepository<Led
     public IRepository<Account> Accounts { get; } = accounts;
 }
 
+public interface IProductRepository;
+
+public sealed class ProductRepository : IProductRepository;
+
+public sealed class CachedProductRepository(IProductRepository inner) : IProductRepository
+{
+    public IProductRepository Inner { get; } = inner;
+}
+
+public sealed class CachedPriceRepository(IProductRepository inner, ICustomerRepository customers) : IProductRepository
+{
+    public IProductRepository Inner { get; } = inner;
+
+    public ICustomerRepository Customers { get; } = customers;
+}
+
 public sealed class OrderService(ICustomerRepository customers, OrderRepository orders)
 {
     public ICustomerRepository Customers { get; } = customers;

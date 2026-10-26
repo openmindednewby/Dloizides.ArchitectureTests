@@ -14,13 +14,26 @@ public sealed class ControllerRoutesTests
         {
             typeof(CaseArchiveController).FullName!,
             typeof(CasesController).FullName!,
+            typeof(DailyReportsController).FullName!,
             typeof(IngestController).FullName!,
             typeof(IngestJobController).FullName!,
+            typeof(MonthlyReportsController).FullName!,
         };
 
         var shared = ControllerRoutes.SharedIn(assemblies);
 
         Assert.Equal(expected, shared);
+    }
+
+    [Fact]
+    public void SharedIn_WithRouteInheritedFromBaseController_NamesBothControllers()
+    {
+        var assemblies = new[] { typeof(DailyReportsController).Assembly };
+
+        var shared = ControllerRoutes.SharedIn(assemblies);
+
+        Assert.Contains(typeof(DailyReportsController).FullName!, shared);
+        Assert.Contains(typeof(MonthlyReportsController).FullName!, shared);
     }
 
     [Fact]
