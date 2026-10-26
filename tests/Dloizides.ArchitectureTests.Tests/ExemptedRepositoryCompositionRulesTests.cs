@@ -12,6 +12,7 @@ public sealed class ExemptedRepositoryCompositionRulesTests : RepositoryComposit
     [
         new(typeof(OrderRepository), "reads the customer row inside the order query"),
         new(typeof(LedgerStore), "the ledger wraps the account store"),
+        new(typeof(CatalogRepository), "the catalogue reads products until the service owns both"),
         new(typeof(CachedPriceRepository), "prices read the customer tier until the service owns it"),
     ];
 }

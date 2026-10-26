@@ -25,7 +25,8 @@ public static class RepositoryDependencies
             .SelectMany(constructor => constructor.GetParameters())
             .Any(parameter => IsRepository(parameter.ParameterType) && !Decorates(repository, parameter.ParameterType));
 
-    private static bool Decorates(Type repository, Type parameterType) => parameterType.IsInterface && repository.GetInterfaces().Contains(parameterType);
+    private static bool Decorates(Type repository, Type parameterType) =>
+        parameterType.IsInterface && repository.GetInterfaces().Where(HasRepositoryName).SequenceEqual([parameterType]);
 
     private static bool IsRepository(Type type) => HasRepositoryName(type) || type.GetInterfaces().Any(HasRepositoryName);
 

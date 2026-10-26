@@ -10,7 +10,7 @@ public sealed class RepositoryDependenciesTests
     public void CombiningIn_WithRepositoriesTakingRepositories_NamesOnlyThoseRepositories()
     {
         var assemblies = new[] { typeof(OrderRepository).Assembly };
-        var expected = new[] { typeof(CachedPriceRepository).FullName!, typeof(LedgerStore).FullName!, typeof(OrderRepository).FullName! };
+        var expected = new[] { typeof(CachedPriceRepository).FullName!, typeof(CatalogRepository).FullName!, typeof(LedgerStore).FullName!, typeof(OrderRepository).FullName! };
 
         var combining = RepositoryDependencies.CombiningIn(assemblies);
 
@@ -35,6 +35,16 @@ public sealed class RepositoryDependenciesTests
         var combining = RepositoryDependencies.CombiningIn(assemblies);
 
         Assert.Contains(typeof(CachedPriceRepository).FullName!, combining);
+    }
+
+    [Fact]
+    public void CombiningIn_WithRepositoryImplementingTwoRepositoryInterfaces_NamesIt()
+    {
+        var assemblies = new[] { typeof(CatalogRepository).Assembly };
+
+        var combining = RepositoryDependencies.CombiningIn(assemblies);
+
+        Assert.Contains(typeof(CatalogRepository).FullName!, combining);
     }
 
     [Fact]

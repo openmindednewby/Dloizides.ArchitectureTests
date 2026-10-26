@@ -32,6 +32,13 @@ public sealed class CachedPriceRepository(IProductRepository inner, ICustomerRep
     public ICustomerRepository Customers { get; } = customers;
 }
 
+public interface ICatalogRepository;
+
+public sealed class CatalogRepository(IProductRepository products) : IProductRepository, ICatalogRepository
+{
+    public IProductRepository Products { get; } = products;
+}
+
 public sealed class OrderService(ICustomerRepository customers, OrderRepository orders)
 {
     public ICustomerRepository Customers { get; } = customers;
