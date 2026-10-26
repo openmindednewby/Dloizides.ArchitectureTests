@@ -34,6 +34,16 @@ For an MVC service, add `public sealed class ControllerValidatorTests : Controll
 
 To skip a type on purpose, override `Exemptions` (tenant filter, MVC validator) or `RequestValidatorExemptions` (validator) with `new ArchitectureExemption(typeof(T), "why it is safe")`; the reason is required. An exempted type that gains a filter or validator fails the `...Exemptions_..._EachStill...` test, so a stale exemption cannot linger.
 
+## Repository composition and one controller per route
+
+Both rules are opt-in, so adopting a new package version never turns a service red on its own.
+
+`public sealed class RepositoryTests : RepositoryCompositionRules { protected override IEnumerable<Assembly> ServiceAssemblies => [typeof(Program).Assembly]; }` fails for every concrete class named `*Repository` (or implementing an interface named `*Repository`, generic ones included) whose public constructor takes another repository (C2 "A repository never takes another repository; combining is a service's job"). A service that needs two repositories takes both.
+
+`public sealed class RouteTests : ControllerRouteRules { protected override IEnumerable<Assembly> ServiceAssemblies => [typeof(Program).Assembly]; }` fails for every MVC controller (derives from `ControllerBase`) whose class-level `[Route]` template another controller also declares (C3 "One controller per route prefix; new actions on a resource join its controller"). `[controller]` is replaced by the class name minus `Controller`; the comparison ignores case and leading/trailing `/`. A FastEndpoints service has no controllers, so the rule passes with nothing to check.
+
+Both take `Exemptions` as a baseline of known offenders (`new ArchitectureExemption(typeof(T), "why")`); an exempted type that stops offending fails the `...Exemptions_..._EachStill...` test.
+
 ## Re-implemented packages
 
 `ReimplementedPackageRules.AssertNone(typeof(Program).Assembly)` fails for every type in that assembly that re-implements a shared package listed in `ReimplementedPackages.All` (QUAL-ADOPT-1 "Fail lint/arch tests when an app re-implements an existing package"): a local `RealmAuthorizationHandler`/`RealmAuthorizationExtensions` (use `Identity.Keycloak`), an own `ApiKeyAuthMiddleware`/`ApiKeyAuthenticationHandler` (use `Dloizides.ApiKeys`), a method body that builds an NSwag `OpenApiOAuthFlow` (the Swagger OAuth2/PKCE block, owned by `ApiDocs.AspNetCore`), and the `LogStress` debug endpoint (delete it). `ReimplementedPackageRules.MissingIn(assembly)` returns the findings. Pass `new ArchitectureExemption(typeof(T), "why")` for a type kept on purpose; an exemption that matches nothing fails too.

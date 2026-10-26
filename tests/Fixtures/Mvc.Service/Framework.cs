@@ -16,6 +16,12 @@ namespace Microsoft.AspNetCore.Mvc
     [AttributeUsage(AttributeTargets.Parameter)]
     public sealed class FromServicesAttribute : Attribute;
 
+    [AttributeUsage(AttributeTargets.Class | AttributeTargets.Method, AllowMultiple = true)]
+    public sealed class RouteAttribute(string template) : Attribute
+    {
+        public string Template { get; } = template;
+    }
+
     [AttributeUsage(AttributeTargets.Method)]
     public sealed class NonActionAttribute : Attribute;
 }

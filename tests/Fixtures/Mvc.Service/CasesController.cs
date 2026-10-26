@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Mvc.Service;
 
+[Route("v1/[controller]")]
 public sealed class CasesController : ControllerBase
 {
     public string Open([FromBody] OpenCaseRequest request) => request.Subject;

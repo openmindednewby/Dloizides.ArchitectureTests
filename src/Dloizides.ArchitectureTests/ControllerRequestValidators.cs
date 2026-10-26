@@ -38,7 +38,7 @@ public static class ControllerRequestValidators
 
     private static bool IsConcreteClass(Type type) => type.IsClass && !type.IsAbstract && !type.ContainsGenericParameters;
 
-    private static bool IsController(Type type)
+    internal static bool IsController(Type type)
     {
         if (!IsConcreteClass(type))
             return false;
