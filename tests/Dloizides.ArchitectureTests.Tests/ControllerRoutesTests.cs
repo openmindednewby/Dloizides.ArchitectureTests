@@ -45,4 +45,37 @@ public sealed class ControllerRoutesTests
 
         Assert.Empty(shared);
     }
+
+    [Fact]
+    public void SharedIn_WithControllersOnBareVersionRoute_SkipsThem()
+    {
+        var assemblies = new[] { typeof(MeController).Assembly };
+
+        var shared = ControllerRoutes.SharedIn(assemblies);
+
+        Assert.DoesNotContain(typeof(MeController).FullName!, shared);
+        Assert.DoesNotContain(typeof(QuotaController).FullName!, shared);
+    }
+
+    [Fact]
+    public void SharedIn_WithControllersOnApiVersionRoute_SkipsThem()
+    {
+        var assemblies = new[] { typeof(BrandingController).Assembly };
+
+        var shared = ControllerRoutes.SharedIn(assemblies);
+
+        Assert.DoesNotContain(typeof(BrandingController).FullName!, shared);
+        Assert.DoesNotContain(typeof(WatchlistVersionController).FullName!, shared);
+    }
+
+    [Fact]
+    public void SharedIn_WithControllersOnOneVersionedResourceRoute_NamesBoth()
+    {
+        var assemblies = new[] { typeof(IngestController).Assembly };
+
+        var shared = ControllerRoutes.SharedIn(assemblies);
+
+        Assert.Contains(typeof(IngestController).FullName!, shared);
+        Assert.Contains(typeof(IngestJobController).FullName!, shared);
+    }
 }

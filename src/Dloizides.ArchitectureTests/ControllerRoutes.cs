@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.RegularExpressions;
 
 namespace Dloizides.ArchitectureTests;
 
@@ -11,6 +12,7 @@ public static class ControllerRoutes
     private const string RouteAttribute = "Microsoft.AspNetCore.Mvc.RouteAttribute";
     private const string ControllerSegment = "[controller]";
     private const string ControllerSuffix = "Controller";
+    private static readonly Regex VersionOnly = new("^(API/)?V[0-9]+$", RegexOptions.CultureInvariant, TimeSpan.FromSeconds(1));
 
     /// <summary>Names every MVC controller whose class-level route template another controller also declares.</summary>
     public static IReadOnlyList<string> SharedIn(IEnumerable<Assembly> assemblies) =>
@@ -30,7 +32,8 @@ public static class ControllerRoutes
             .Where(attribute => string.Equals(attribute.AttributeType.FullName, RouteAttribute, StringComparison.Ordinal))
             .Select(attribute => attribute.ConstructorArguments.Count > 0 ? attribute.ConstructorArguments[0].Value as string : null)
             .OfType<string>()
-            .Select(template => Normalize(template, controller.Name));
+            .Select(template => Normalize(template, controller.Name))
+            .Where(template => !VersionOnly.IsMatch(template));
 
     private static IEnumerable<Type> SelfAndBases(Type controller)
     {

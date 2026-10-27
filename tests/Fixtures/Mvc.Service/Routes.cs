@@ -20,3 +20,15 @@ public abstract class ReportsControllerBase : ControllerBase;
 public sealed class DailyReportsController : ReportsControllerBase;
 
 public sealed class MonthlyReportsController : ReportsControllerBase;
+
+[Route("v1")]
+public sealed class MeController : ControllerBase;
+
+[Route("v1")]
+public sealed class QuotaController : ControllerBase;
+
+[Route("/api/v1/")]
+public sealed class BrandingController : ControllerBase;
+
+[Route("api/v1")]
+public sealed class WatchlistVersionController : ControllerBase;
