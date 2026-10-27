@@ -42,7 +42,9 @@ Both rules are opt-in, so adopting a new package version never turns a service r
 
 `public sealed class RouteTests : ControllerRouteRules { protected override IEnumerable<Assembly> ServiceAssemblies => [typeof(Program).Assembly]; }` fails for every MVC controller (derives from `ControllerBase`) whose class-level `[Route]` template another controller also declares (C3 "One controller per route prefix; new actions on a resource join its controller"). `[controller]` is replaced by the class name minus `Controller`; the comparison ignores case and leading/trailing `/`. A `[Route]` inherited from a base controller counts. A FastEndpoints service has no controllers, so the rule passes with nothing to check. Templates are compared whole: `api/parks` and `api/parks/{id}/reports` do not clash, and `[area]` is not substituted.
 
-Both take `Exemptions` as a baseline of known offenders (`new ArchitectureExemption(typeof(T), "why")`); an exempted type that stops offending fails the `...Exemptions_..._EachStill...` test.
+`public sealed class DatabaseAccessTests : RepositoryOnlyDatabaseRules { protected override IEnumerable<Assembly> ServiceAssemblies => [typeof(Program).Assembly]; }` fails for every class not named `*Repository` or `*Store` whose constructor (primary constructors included) or field takes a `DbContext` subclass or `IDbContextFactory<T>` (REPO-ONLY-1 "Only repositories touch the database"). Not checked: `DbContext` subclasses, `IEntityTypeConfiguration<T>` and `IDesignTimeDbContextFactory<T>` implementations, `Migration` and `ModelSnapshot` subclasses, compiler-generated types. Types are matched by EF Core type name, so any EF Core version works. The analyzer twin is DLZ0015 in `Dloizides.Analyzers`. Freeze today's offenders in `Exemptions`; the list only shrinks.
+
+All three take `Exemptions` as a baseline of known offenders (`new ArchitectureExemption(typeof(T), "why")`); an exempted type that stops offending fails the `...Exemptions_..._EachStill...` test.
 
 ## Re-implemented packages
 
