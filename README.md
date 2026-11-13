@@ -44,7 +44,9 @@ Both rules are opt-in, so adopting a new package version never turns a service r
 
 `public sealed class DatabaseAccessTests : RepositoryOnlyDatabaseRules { protected override IEnumerable<Assembly> ServiceAssemblies => [typeof(Program).Assembly]; }` fails for every class not named `*Repository` or `*Store` whose constructor (primary constructors included) or field takes a `DbContext` subclass or `IDbContextFactory<T>` (REPO-ONLY-1 "Only repositories touch the database"). Not checked: `DbContext` subclasses, `IEntityTypeConfiguration<T>` and `IDesignTimeDbContextFactory<T>` implementations, `Migration` and `ModelSnapshot` subclasses, compiler-generated types. Types are matched by EF Core type name, so any EF Core version works. The analyzer twin is DLZ0015 in `Dloizides.Analyzers`. Freeze today's offenders in `Exemptions`; the list only shrinks.
 
-All three take `Exemptions` as a baseline of known offenders (`new ArchitectureExemption(typeof(T), "why")`); an exempted type that stops offending fails the `...Exemptions_..._EachStill...` test.
+`public sealed class ControllerServiceTests : ControllerServiceRules { protected override IEnumerable<Assembly> ServiceAssemblies => [typeof(Program).Assembly]; }` fails for every MVC controller (derives from `ControllerBase`) or FastEndpoints endpoint (derives from `Endpoint<...>` or `EndpointWithoutRequest`) whose public constructor (primary constructors included) takes a type named `*Repository` or implementing an interface named `*Repository` (CONTROLLER-SERVICE-1 "A controller calls a service, never a repository"). The controller calls a service; the service takes the repository. Not checked: property injection and `Resolve<T>()` inside a handler. Freeze today's offenders in `Exemptions`; the list only shrinks.
+
+All four take `Exemptions` as a baseline of known offenders (`new ArchitectureExemption(typeof(T), "why")`); an exempted type that stops offending fails the `...Exemptions_..._EachStill...` test.
 
 ## Re-implemented packages
 

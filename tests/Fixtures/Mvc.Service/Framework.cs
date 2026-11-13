@@ -32,3 +32,10 @@ namespace FluentValidation
 
     public abstract class AbstractValidator<T> : IValidator<T>;
 }
+
+namespace FastEndpoints
+{
+    public abstract class Endpoint<TRequest, TResponse>;
+
+    public abstract class EndpointWithoutRequest : Endpoint<object, object>;
+}
